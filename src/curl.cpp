@@ -2504,7 +2504,7 @@ int S3fsCurl::RequestPerform(bool dontAddAuthHeaders /*=false*/)
         
         // Insert headers
         if(!dontAddAuthHeaders) {
-            insertAuthHeaders();
+             insertAuthHeaders();
         }
 
         if(CURLE_OK != curl_easy_setopt(hCurl, CURLOPT_HTTPHEADER, requestHeaders)){

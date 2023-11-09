@@ -164,8 +164,8 @@ class S3fsCred
 
         bool LoadIAMRoleFromMetaData();
 
-        bool CheckIAMCredentialUpdate(std::string* access_key_id = nullptr, std::string* secret_access_key = nullptr, std::string* access_token = nullptr);
-        bool CheckAwsCredentialUpdate(std::string* access_key_id, std::string* secret_access_key, std::string* access_token);
+        bool CheckIAMCredentialUpdate(std::string* access_key_id = NULL, std::string* secret_access_key = NULL, std::string* access_token = NULL);
+        bool CheckAwsCredentialUpdate(std::string* access_key_id = NULL, std::string* secret_access_key = NULL, std::string* access_token = NULL);
 
         const char* GetCredFuncVersion(bool detail) const;
 

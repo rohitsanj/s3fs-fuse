@@ -5075,7 +5075,7 @@ static int my_fuse_opt_proc(void* data, const char* arg, int key, struct fuse_ar
             S3fsCurl::SetCredsCache(false);
             return 0;
         }
-        else if(is_prefix(arg, "parallel_count=") || is_prefix(arg, "parallel_upload=")){
+        if(is_prefix(arg, "parallel_count=") || is_prefix(arg, "parallel_upload=")){
             int maxpara = static_cast<int>(cvt_strtoofft(strchr(arg, '=') + sizeof(char), /*base=*/ 10));
             if(0 >= maxpara){
                 S3FS_PRN_EXIT("argument should be over 1: parallel_count");
