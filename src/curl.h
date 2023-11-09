@@ -126,6 +126,7 @@ class S3fsCurl
         static bool             is_cert_check;
         static bool             is_dns_cache;
         static bool             is_ssl_session_cache;
+        static bool             is_creds_cache;
         static long             connect_timeout;
         static time_t           readwrite_timeout;
         static int              retries;
@@ -281,6 +282,7 @@ class S3fsCurl
         static bool SetCheckCertificate(bool isCertCheck);
         static bool SetDnsCache(bool isCache);
         static bool SetSslSessionCache(bool isCache);
+        static bool SetCredsCache(bool isCache);
         static long SetConnectTimeout(long timeout);
         static time_t SetReadwriteTimeout(time_t timeout);
         static time_t GetReadwriteTimeout() { return S3fsCurl::readwrite_timeout; }

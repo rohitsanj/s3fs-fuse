@@ -89,6 +89,7 @@ CURLSH*          S3fsCurl::hCurlShare          = NULL;
 bool             S3fsCurl::is_cert_check       = true; // default
 bool             S3fsCurl::is_dns_cache        = true; // default
 bool             S3fsCurl::is_ssl_session_cache= true; // default
+bool             S3fsCurl::is_creds_cache      = true; // default
 long             S3fsCurl::connect_timeout     = 300;  // default
 time_t           S3fsCurl::readwrite_timeout   = 120;  // default
 int              S3fsCurl::retries             = 5;    // default
@@ -731,6 +732,13 @@ bool S3fsCurl::SetSslSessionCache(bool isCache)
 {
     bool old = S3fsCurl::is_ssl_session_cache;
     S3fsCurl::is_ssl_session_cache = isCache;
+    return old;
+}
+
+bool S3fsCurl::SetCredsCache(bool isCache)
+{
+    bool old = S3fsCurl::is_creds_cache;
+    S3fsCurl::is_creds_cache = isCache;
     return old;
 }
 
@@ -2536,6 +2544,15 @@ int S3fsCurl::RequestPerform(bool dontAddAuthHeaders /*=false*/)
                         }else if(value == "KeyTooLongError"){
                             result = -ENAMETOOLONG;
                             break;
+                        }
+                    }
+                }
+
+                // Refresh credentials if we get a 4xx client error
+                if (responseCode >= 400 and responseCode < 500) {
+                    if (!S3fsCurl::is_creds_cache) {
+                        if (!S3fsCurl::ps3fscred->CheckAwsCredentialUpdate()) {
+                            S3FS_PRN_EXIT("Failed to read AWS creds from $HOME/.aws/credentials");
                         }
                     }
                 }
