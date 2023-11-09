@@ -952,6 +952,30 @@ bool S3fsCred::ReadAwsCredentialFile(const std::string &filename, AutoLock::Type
     return true;
 }
 
+
+bool S3fsCred::CheckAwsCredentialUpdate(std::string* access_key_id, std::string* secret_access_key, std::string* access_token)
+{
+    // Read from credentials file every time
+    // to remain up-to-date
+    std::string aws_credentials = std::string(getpwuid(getuid())->pw_dir) + "/.aws/credentials";
+    if (!ReadAwsCredentialFile(aws_credentials, AutoLock::NONE)) {
+        S3FS_PRN_ERR("Failed to read AWS creds from $HOME/.aws/credentials");
+        return false;
+    }
+
+    // set
+    if(access_key_id){
+        *access_key_id = AWSAccessKeyId;
+    }
+    if(secret_access_key){
+        *secret_access_key = AWSSecretAccessKey;
+    }
+    if(access_token){
+        *access_token = AWSAccessToken;
+    }
+
+    return true;
+}
 //
 // InitialS3fsCredentials
 //

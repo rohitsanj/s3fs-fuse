@@ -89,6 +89,7 @@ CURLSH*          S3fsCurl::hCurlShare          = NULL;
 bool             S3fsCurl::is_cert_check       = true; // default
 bool             S3fsCurl::is_dns_cache        = true; // default
 bool             S3fsCurl::is_ssl_session_cache= true; // default
+bool             S3fsCurl::is_creds_cache      = true; // default
 long             S3fsCurl::connect_timeout     = 300;  // default
 time_t           S3fsCurl::readwrite_timeout   = 120;  // default
 int              S3fsCurl::retries             = 5;    // default
@@ -731,6 +732,13 @@ bool S3fsCurl::SetSslSessionCache(bool isCache)
 {
     bool old = S3fsCurl::is_ssl_session_cache;
     S3fsCurl::is_ssl_session_cache = isCache;
+    return old;
+}
+
+bool S3fsCurl::SetCredsCache(bool isCache)
+{
+    bool old = S3fsCurl::is_creds_cache;
+    S3fsCurl::is_creds_cache = isCache;
     return old;
 }
 
@@ -2496,7 +2504,7 @@ int S3fsCurl::RequestPerform(bool dontAddAuthHeaders /*=false*/)
         
         // Insert headers
         if(!dontAddAuthHeaders) {
-             insertAuthHeaders();
+            insertAuthHeaders();
         }
 
         if(CURLE_OK != curl_easy_setopt(hCurl, CURLOPT_HTTPHEADER, requestHeaders)){
@@ -2955,6 +2963,13 @@ void S3fsCurl::insertAuthHeaders()
     if(!S3fsCurl::ps3fscred->CheckIAMCredentialUpdate(&access_key_id, &secret_access_key, &access_token)){
         S3FS_PRN_ERR("An error occurred in checking IAM credential.");
         return; // do not insert auth headers on error
+    }
+
+    if (!S3fsCurl::is_creds_cache) {
+        if (!S3fsCurl::ps3fscred->CheckAwsCredentialUpdate(&access_key_id, &secret_access_key, &access_token)) {
+            S3FS_PRN_ERR("Failed to read AWS creds from $HOME/.aws/credentials");
+            return;
+        }
     }
 
     if(S3fsCurl::ps3fscred->IsIBMIAMAuth()){
