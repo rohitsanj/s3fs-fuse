@@ -2548,6 +2548,15 @@ int S3fsCurl::RequestPerform(bool dontAddAuthHeaders /*=false*/)
                     }
                 }
 
+                // Refresh credentials if we get a 4xx client error
+                if (responseCode >= 400 and responseCode < 500) {
+                    if (!S3fsCurl::is_creds_cache) {
+                        if (!S3fsCurl::ps3fscred->CheckAwsCredentialUpdate(&access_key_id, &secret_access_key, &access_token)) {
+                            S3FS_PRN_EXIT("Failed to read AWS creds from $HOME/.aws/credentials");
+                        }
+                    }
+                }
+
                 // Service response codes which are >= 300 && < 500
                 switch(responseCode){
                     case 301:
@@ -2963,13 +2972,6 @@ void S3fsCurl::insertAuthHeaders()
     if(!S3fsCurl::ps3fscred->CheckIAMCredentialUpdate(&access_key_id, &secret_access_key, &access_token)){
         S3FS_PRN_ERR("An error occurred in checking IAM credential.");
         return; // do not insert auth headers on error
-    }
-
-    if (!S3fsCurl::is_creds_cache) {
-        if (!S3fsCurl::ps3fscred->CheckAwsCredentialUpdate(&access_key_id, &secret_access_key, &access_token)) {
-            S3FS_PRN_ERR("Failed to read AWS creds from $HOME/.aws/credentials");
-            return;
-        }
     }
 
     if(S3fsCurl::ps3fscred->IsIBMIAMAuth()){
