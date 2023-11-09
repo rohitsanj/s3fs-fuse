@@ -2551,7 +2551,7 @@ int S3fsCurl::RequestPerform(bool dontAddAuthHeaders /*=false*/)
                 // Refresh credentials if we get a 4xx client error
                 if (responseCode >= 400 and responseCode < 500) {
                     if (!S3fsCurl::is_creds_cache) {
-                        if (!S3fsCurl::ps3fscred->CheckAwsCredentialUpdate(&access_key_id, &secret_access_key, &access_token)) {
+                        if (!S3fsCurl::ps3fscred->CheckAwsCredentialUpdate()) {
                             S3FS_PRN_EXIT("Failed to read AWS creds from $HOME/.aws/credentials");
                         }
                     }
